@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello {{controller_name}}!{% endblock %}
+
+{% block body %}
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">{{titre}}</h1>
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item"><a href="index.html">{{mainTitle}}</a></li>
+                    <li class="breadcrumb-item active">Supprimer</li>
+                </ol>
+                <h2>{{mainTitle}} n° {{id}} supprimer avec succes<h2>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="card" style="width: 18rem;">
+                            <img src="..." class="card-img-top" alt="...">
+                            <div class="card-body">
+                              <h5 class="card-title">n°{{id}} {{article.titre}}</h5>
+                              <p class="card-text">{{article.texte}}</p>
+                              <a href="#" class="btn btn-primary">{{ article.date ? article.date|date('d-m-Y') : 'Pas de date' }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="height: 100vh"></div>
+                <div class="card mb-4"><div class="card-body">When scrolling, the navigation stays at the top of the page. This is the end of the static navigation demo.</div></div>
+            </div>
+        </main>
+    </div>
+    </div>
+
+{% endblock %}
