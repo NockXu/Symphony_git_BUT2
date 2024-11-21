@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ArticleController extends AbstractController
 {
@@ -22,8 +26,15 @@ class ArticleController extends AbstractController
     }
 
     #[Route('/article/creer', name: 'app_article_create')]
-    public function create(EntityManagerInterface $entityManager, Request $request): Response
+    public function create(
+        EntityManagerInterface $entityManager, 
+        Request $request, 
+        SluggerInterface $slugger, 
+        #[Autowire('%kernel.project_dir%/public/uploads/images')] string $imagesDirectory
+        ): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
         $article = new Article();
         
         $form = $this->createForm(ArticleType::class, $article);
@@ -31,6 +42,21 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $article = $form->getData();
+            
+            $image = $form->get('image')->getData();
+            if ($image){
+                $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+
+                try {
+                    $image->move($imagesDirectory, $newFilename);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+            }
+
+            $article->setImageFilename($newFilename);
 
             $entityManager->persist($article);
 
@@ -69,8 +95,16 @@ class ArticleController extends AbstractController
     }
 
     #[Route('/article/update/{id}', name: 'app_article_update')]
-    public function update(EntityManagerInterface $entityManager, int $id, Request $request): Response
+    public function update(
+        EntityManagerInterface $entityManager, 
+        int $id, 
+        Request $request,
+        SluggerInterface $slugger, 
+        #[Autowire('%kernel.project_dir%/public/uploads/images')] string $imagesDirectory
+        ): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+
         $article = $entityManager->getRepository(Article::class)->find($id);
 
         if (!$article) {
@@ -84,6 +118,21 @@ class ArticleController extends AbstractController
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $article = $form->getData();
+
+                $image = $form->get('image')->getData();
+                if ($image){
+                    $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+
+                    try {
+                        $image->move($imagesDirectory, $newFilename);
+                    } catch (FileException $e) {
+                        // ... handle exception if something happens during file upload
+                    }
+
+                    $article->setImage($newFilename);
+                }                
 
                 $entityManager->persist($article);
 
@@ -107,6 +156,8 @@ class ArticleController extends AbstractController
     #[Route('/article/delete/{id}', name: 'app_article_delete')]
     public function delete(EntityManagerInterface $entityManager, int $id): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
+        
         $article = $entityManager->getRepository(Article::class)->find($id);
 
         if (!$article) {

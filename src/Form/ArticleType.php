@@ -5,8 +5,10 @@ namespace App\Form;
 use App\Entity\Article;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -34,6 +36,21 @@ class ArticleType extends AbstractType
                 'attr' => ['class' => 'form-control'],
                 'label_attr' => ['class' => 'form-label mt-2'],
                 'widget' => 'single_text',
+            ])
+            ->add('image', FileType::class, [
+                'label' => 'Image (PNG file)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new FILE([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/png',
+                            'image/jpeg',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image document',
+                    ])
+                ]
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Confirmer',

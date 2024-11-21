@@ -20,8 +20,8 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="card" style="width: 300px;">
-                            <img src="..." class="card-img-top" alt="...">
                             <div class="card-body">
+                                <img src="{{ asset('uploads/images/' ~ article.image) }}" class="card-img-top" alt="{{article.image}}">
                                 <h5 class="card-title">n°{{article.id}} {{article.titre}}</h5>
                                 <p class="card-text">{{article.texte}}</p>
                                 <p>{{ article.date ? article.date|date('d-m-Y') : 'Pas de date' }}</p>
@@ -32,8 +32,6 @@
                     </div>
                 </div>
                 {% endfor %}
-                <div style="height: 100vh"></div>
-                <div class="card mb-4"><div class="card-body">When scrolling, the navigation stays at the top of the page. This is the end of the static navigation demo.</div></div>
             </div>
         </main>
     </div>

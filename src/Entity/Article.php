@@ -23,8 +23,12 @@ class Article
     #[ORM\Column]
     private ?bool $publie = null;
 
+
     #[ORM\Column]
     private ?\DateTimeImmutable $date = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
 
     public function getId(): ?int
     {
@@ -75,6 +79,18 @@ class Article
     public function setDate(\DateTimeImmutable $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }
