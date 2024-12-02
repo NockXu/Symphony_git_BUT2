@@ -56,7 +56,7 @@ class ArticleController extends AbstractController
                 }
             }
 
-            $article->setImageFilename($newFilename);
+            $article->setImage($newFilename);
 
             $entityManager->persist($article);
 
